@@ -24,6 +24,8 @@ public class Ball : MonoBehaviour {
         rigid.velocity = Random.insideUnitCircle.normalized * speed;// new Vector3(1.0f, 0.5f, 0);
 
         this.transform.localPosition = Random.insideUnitCircle * 1;
+
+        this.transform.localScale = Vector3.one * (1 + Random.value * 1f);
     }
 	
 	// Update is called once per frame
@@ -41,16 +43,14 @@ public class Ball : MonoBehaviour {
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Bounding(collision);
+        Bouncing(collision);
     }
 
-    private void Bounding(Collider2D collision)
+    private void Bouncing(Collider2D collision)
     {
         var other = collision.gameObject.GetComponent<Ball>();
         if (other != null)
         {
-            //Debug.Log("B!!");
-
             float dx = other.transform.localPosition.x - this.transform.localPosition.x;
             float dy = other.transform.localPosition.y - this.transform.localPosition.y;
 
@@ -58,32 +58,17 @@ public class Ball : MonoBehaviour {
 
             float angle = Mathf.Atan2(bVect.y, bVect.x);
 
-            var cosine = Mathf.Cos(angle);
-            var sine = Mathf.Sin(angle);
+            float targetX = this.transform.localPosition.x + Mathf.Cos(angle);
+            float targetY = this.transform.localPosition.y + Mathf.Sin(angle);
 
-            float targetX = Velocity.x + cosine * 1;
-            float targetY = Velocity.y + sine * 1;
-            float ax = (targetX);
-            float ay = (targetY);
+            float ax = (targetX - other.transform.localPosition.x);
+            float ay = (targetY - other.transform.localPosition.y);
 
-            dir = (new Vector2(-ax, -ay).normalized * Velocity.magnitude);
-            dir1 = (new Vector2(ax, ay).normalized * Velocity.magnitude);
+            Vector2 vel = new Vector2(Velocity.x - ax, Velocity.y - ay);
+            Vector2 other_vel = new Vector2(other.Velocity.x + ax, other.Velocity.y + ay);
 
-            other_p = other.transform.localPosition;
-            this.ApplyForce(new Vector2(-ax, -ay).normalized * Velocity.magnitude);
-            other.ApplyForce(new Vector2(ax, ay).normalized * Velocity.magnitude);
-            //this.ApplyForce(Vector3.zero);
-            //other.ApplyForce(Vector3.zero);
+            this.ApplyForce(vel.normalized * Velocity.magnitude);
+            other.ApplyForce(other_vel.normalized * Velocity.magnitude);
         }
-    }
-
-    Vector2 dir;
-    Vector2 dir1;
-
-    Vector3 other_p;
-    private void OnDrawGizmos()
-    {
-        Gizmos.DrawLine(this.transform.localPosition, dir);
-        Gizmos.DrawLine(other_p, dir1);
     }
 }

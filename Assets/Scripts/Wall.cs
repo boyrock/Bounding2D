@@ -16,7 +16,17 @@ public class Wall : MonoBehaviour {
 
     }
 
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        Bouncing(collision);
+    }
+
     private void OnTriggerEnter2D(Collider2D collision)
+    {
+        Bouncing(collision);
+    }
+
+    private void Bouncing(Collider2D collision)
     {
         var ball = collision.gameObject.GetComponent<Ball>();
         if (ball != null)
@@ -26,10 +36,10 @@ public class Wall : MonoBehaviour {
             var velocity = ball.Velocity;
             switch (direction)
             {
-                case Direction.Up:
+                case Direction.Top:
                     force = new Vector2(velocity.x, -Mathf.Abs(velocity.y));
                     break;
-                case Direction.Down:
+                case Direction.Bottom:
                     force = new Vector2(velocity.x, Mathf.Abs(velocity.y));
                     break;
                 case Direction.Left:
@@ -48,8 +58,8 @@ public class Wall : MonoBehaviour {
 
     public enum Direction
     {
-        Up,
-        Down,
+        Top,
+        Bottom,
         Left,
         Right
     }
